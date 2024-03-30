@@ -1,0 +1,31 @@
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading;
+public class Program
+{
+	public static void Main(string[] args)
+    {
+       for(var i=0;i<=5;i++){
+		   
+		   //For space
+		    for(var j=5;j>i;j--){
+				Console.Write(" ");
+			}
+		   //For right triangle
+		   for(var k=0;k<=i;k++){
+				Console.Write("*");
+			}
+		   //For left Triangle
+		   for(var k=1;k<=i;k++){
+				Console.Write("*");
+			}
+		  
+		   
+		   Console.WriteLine();
+	   }
+		
+    }
+  
+}
