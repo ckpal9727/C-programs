@@ -1,0 +1,29 @@
+
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading;
+public class Program
+{
+	public static void Main(string[] args)
+    {
+        // Creating a new thread and passing a method to execute
+		Console.WriteLine("Enter number =");
+        var data=Console.ReadLine();
+		StringBuilder result= new StringBuilder();
+		foreach(var c in data){
+			result.Insert(0,c);			
+		}
+		Console.WriteLine(result.ToString());
+		Console.WriteLine(data);
+		if(result.ToString()==data){
+			Console.WriteLine("Same");
+		}else{
+			Console.WriteLine("Not Same");
+		}
+			
+		
+    }
+  
+}
