@@ -1,0 +1,29 @@
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading;
+public class Program
+{
+	public static void Main(string[] args)
+    {
+        // Creating a new thread and passing a method to execute
+		Console.WriteLine("Enter number =");
+        var num=int. Parse(Console.ReadLine());
+		int flag=0;
+		for(var i=2;i<=num/2;i++){
+			if(num%i==0){
+				
+				flag=1;
+				break;
+			}
+		}
+		if(flag!=1){
+			Console.Write("The number is "+num +" palindrom");
+		}else{
+			Console.Write("The number"+num +" is not is palindrom");
+		}
+		
+    }
+  
+}
