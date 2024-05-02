@@ -1,0 +1,104 @@
+using System;
+using System.Drawing;
+using System.IO;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using MyApp3.Drivers;
+using OfficeOpenXml.Style;
+using OfficeOpenXml;
+
+namespace MyApp3.Web.Pages.Drivers
+{
+    public class CreateModalModel : PageModel
+    {
+		private readonly IDriverAppService _driverAppService;
+
+
+		[BindProperty]
+		public CreateUpdateDriverDto Driver { get; set; }
+		public CreateModalModel(IDriverAppService driverAppService)
+		{
+			_driverAppService = driverAppService;
+		}
+
+		public async Task OnGetAsync()
+        {
+			Driver = new CreateUpdateDriverDto();
+            var data = await _driverAppService.GetListAsync();
+            string formatedTemplate = "{0} - {1}.{2}";
+
+            var fileNameWithoutExtension = "myWorkbook.xlsx".Split('.')[0];
+            var fileExtension = "myWorkbook.xlsx".Split('.')[1];
+            var DateValue = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+
+
+            string newname = String.Format(formatedTemplate, fileNameWithoutExtension, DateValue, fileExtension);
+
+
+            using (var package = new ExcelPackage(new FileInfo(@"D:\" + newname)))
+            {
+                //cellNumberForHeader
+                var cellNumberForHeader = 9;
+
+                //Custom Style
+                var nameStyle = package.Workbook.Styles.CreateNamedStyle("HyperLink");
+                nameStyle.Style.Font.UnderLine = true;
+                nameStyle.Style.Font.Color.SetColor(Color.Blue);
+
+                //---
+                var sheet = package.Workbook.Worksheets.Add("My Sheet");
+
+                //Adding Logo
+                var pic = sheet.Drawings.AddPicture("Landscape", new FileInfo("C:\\Users\\91972\\Pictures\\Screenshots\\Priyesh_1.png"));
+                pic.SetPosition(2, 0, 0, 0);
+                pic.SetSize(100, 100);
+             
+
+                //--
+                sheet.Cells["A" + cellNumberForHeader].Value = "ID";
+                sheet.Cells["B" + cellNumberForHeader].Value = "Name";
+                sheet.Cells["C" + cellNumberForHeader].Value = "Email";
+                sheet.Cells["D" + cellNumberForHeader].Hyperlink = new ExcelHyperLink("www.google.com", "Named Link");
+                sheet.Cells["D" + cellNumberForHeader].StyleName = "HyperLink";
+
+                using (var range = sheet.Cells[cellNumberForHeader, 1, 11, 3])//
+                {
+                    range.Style.Font.Bold = true;
+                    range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    range.Style.Fill.BackgroundColor.SetColor(Color.DarkBlue);
+                    range.Style.Font.Color.SetColor(Color.White);
+                    
+                }
+                sheet.Cells["A5:E5"].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                sheet.Cells.AutoFitColumns(0);
+                sheet.HeaderFooter.OddHeader.CenteredText = "&24&U&\"Arial,Regular Bold\" Inventory";
+
+
+                int recordIndex = cellNumberForHeader+1;
+
+                foreach (var article in data)
+                {
+                    sheet.Cells[recordIndex, 1].Value = (recordIndex - (cellNumberForHeader + 1)).ToString();
+
+                    sheet.Cells[recordIndex, 2].Value = article.Name;
+                    sheet.Cells[recordIndex, 3].Value = article.Email;
+                    recordIndex++;
+                }
+                // Save to file
+                package.Save();
+            }
+            
+
+        }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+
+			
+			await _driverAppService.CreateAsync(new CreateUpdateDriverDto() { Name="ckpal",Email="Email"});
+            return RedirectToAction("Driver");
+        }
+    }
+}
